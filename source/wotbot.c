@@ -13,7 +13,7 @@ void wotbot_add_download(wotbot_t *wb, char *url)
 
     if (!socket_connect(s))
     {
-        slog_error(0, "Failed to connect to host %s", s->url->host);
+        slog_error(0, "Failed to connect to host: %s", s->url->host);
         socket_cleanup(s);
         return;
     }
@@ -37,21 +37,24 @@ void wotbot_global_init()
 wotbot_t *wotbot_init(void)
 {
     wotbot_t *wb = (wotbot_t *)malloc(sizeof(wotbot_t));
-    wb->position = 0;
+    wb->kq = kqueue();
+    wb->events = (struct kevent *)malloc(100 * sizeof(struct kevent));
+    // wb->position = 0;
     return wb;
 }
 
 void wotbot_perform(wotbot_t *wb)
 {
-    for (int i = 0; i < wb->position; i++)
-    {
-        socket_t *s = wb->queue[i];
-        printf("%s\n", s->url->host);
-    }
+    // for (int i = 0; i < wb->position; i++)
+    // {
+    //     socket_t *s = wb->queue[i];
+    //     printf("%s\n", s->url->host);
+    // }
 }
 
 void wotbot_queue_add(wotbot_t *wb, socket_t *s)
 {
-    wb->queue[wb->position] = s;
-    ++wb->position;
+    // EV_SET(&evSet, connfd, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, NULL);
+    // wb->queue[wb->position] = s;
+    // ++wb->position;
 }

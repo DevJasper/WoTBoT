@@ -1,8 +1,13 @@
 #include "socket.h"
+
+#include <arpa/inet.h>
+#include <errno.h>
 #include <fcntl.h>
-#include <netdb.h>
+#include <string.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <unistd.h>
+
 #include "slog.h"
 
 void socket_cleanup(socket_t *s)
@@ -13,44 +18,54 @@ void socket_cleanup(socket_t *s)
 
 bool socket_connect(socket_t *s)
 {
-    struct addrinfo hints = {0}, *addrs;
-    int sfd = -1;
 
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-    const int status = getaddrinfo(s->url->ip, s->url->port, &hints, &addrs);
-    if (status != 0)
+    int ret = 0;
+    int conn_fd;
+    struct sockaddr_in server_addr = {0};
+
+    conn_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (conn_fd == -1)
     {
-        slog_error(0, "%s: %s", s->url->host, gai_strerror(status));
+        slog_error(0, "Failed to create socket: %s", s->url->host);
         return false;
     }
 
-    for (struct addrinfo *addr = addrs; addr != NULL; addr = addr->ai_next)
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(atoi(s->url->port));
+
+    if (s->url->ip == NULL)
     {
-        sfd = socket(addrs->ai_family, addrs->ai_socktype, addrs->ai_protocol);
-
-        if (sfd == -1)
-            continue;
-
-        if (fcntl(sfd, F_SETFL, O_NONBLOCK) == -1)
-            continue;
-
-        if (connect(sfd, addr->ai_addr, addr->ai_addrlen) == 0)
-            break;
-
-        close(sfd);
-    }
-
-    freeaddrinfo(addrs);
-
-    if (sfd == -1)
-    {
-        slog_error(0, "%s: %s", s->url->host, gai_strerror(status));
+        slog_error(0, "Failed to resolve IP address: %s", s->url->host);
         return false;
     }
 
-    s->fd = sfd;
+    server_addr.sin_addr.s_addr = inet_addr(s->url->ip);
+
+    if (INADDR_NONE == server_addr.sin_addr.s_addr)
+    {
+        close(conn_fd);
+        return false;
+    }
+
+    if (fcntl(conn_fd, F_SETFL, O_NONBLOCK) == -1)
+    {
+        slog_error(0, "Failed to set non blocking mode: %s", s->url->host);
+        return false;
+    }
+
+    ret = connect(conn_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
+    if (ret == -1)
+    {
+
+        if (errno != EINPROGRESS)
+        {
+            slog_error(0, "Connecting to server failed: %s", s->url->host);
+            return false;
+        }
+    }
+
+    s->fd = conn_fd;
 
     return true;
 }
