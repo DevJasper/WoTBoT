@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "crawler.h": "c",
+        "slog.h": "c",
+        "stdbool.h": "c",
+        "url_parser.h": "c",
+        "socket.h": "c",
+        "wotbot.h": "c",
+        "__node_handle": "c",
+        "regex": "c"
+    }
+}
