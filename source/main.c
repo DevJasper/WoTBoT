@@ -13,7 +13,7 @@ int main()
     wotbot_t *wb = wotbot_init();
     wotbot_add_download(wb, "google.com");
     wotbot_add_download(wb, "https://web.facebook.com");
-    wotbot_add_download(wb, "https://facebook.com");
+    wotbot_add_download(wb, "twitter.com");
     wotbot_perform(wb);
     wotbot_cleanup(wb);
 

@@ -1,14 +1,3 @@
-/*! \file
- *
- * HTTP Status Codes - C Variant
- *
- * https://github.com/j-ulrich/http-status-codes-cpp
- *
- * \version 1.3.0
- * \author Jochen Ulrich <jochenulrich@t-online.de>
- * \copyright Licensed under Creative Commons CC0 (http://creativecommons.org/publicdomain/zero/1.0/)
- */
-
 #ifndef HTTPSTATUSCODES_C_H_
 #define HTTPSTATUSCODES_C_H_
 

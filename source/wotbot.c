@@ -1,15 +1,15 @@
 #include "wotbot.h"
+#include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include "slog.h"
+#include "sys/socket.h"
 
 void wotbot_add_download(wotbot_t *wb, char *url)
 {
 
     socket_t *s = socket_init();
     socket_set_option(s, SOCKETOPT_URL, url);
-
-    // printf("%s\n", s->url->host);
 
     if (!socket_connect(s))
     {
@@ -18,13 +18,22 @@ void wotbot_add_download(wotbot_t *wb, char *url)
         return;
     }
 
-    slog_info(0, "Connected to host %d", s->fd);
+    // char msg[80];
+    // sprintf(msg,
+    //         "GET / HTTP/1.1\r\n"
+    //         "Host: %s\r\n"
+    //         "Connection: close\r\n\r\n",
+    //         s->url->host);
 
-    wotbot_queue_add(wb, s);
+    // socket_write(s, msg, strlen(msg));
+
+    slog_info(0, "Connected to host %d", s->fd);
+    queue_add_event(wb->queue, s);
 }
 
 void wotbot_cleanup(wotbot_t *wb)
 {
+    queue_cleanup(wb->queue);
     free(wb);
 }
 
@@ -37,24 +46,22 @@ void wotbot_global_init()
 wotbot_t *wotbot_init(void)
 {
     wotbot_t *wb = (wotbot_t *)malloc(sizeof(wotbot_t));
-    wb->kq = kqueue();
-    wb->events = (struct kevent *)malloc(100 * sizeof(struct kevent));
-    // wb->position = 0;
+    wb->queue = queue_init();
     return wb;
 }
 
 void wotbot_perform(wotbot_t *wb)
 {
-    // for (int i = 0; i < wb->position; i++)
-    // {
-    //     socket_t *s = wb->queue[i];
-    //     printf("%s\n", s->url->host);
-    // }
-}
 
-void wotbot_queue_add(wotbot_t *wb, socket_t *s)
-{
-    // EV_SET(&evSet, connfd, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, NULL);
-    // wb->queue[wb->position] = s;
-    // ++wb->position;
+    if (kevent(wb->queue->fd, wb->queue->events, wb->queue->size, NULL, 0, NULL) == -1)
+    {
+        slog_error(0, "Failed to register events: %s", strerror(errno));
+        return;
+    }
+    while (1)
+    {
+        int nev = kevent(wb->queue->fd, NULL, 0, wb->queue->changes, wb->queue->size, NULL);
+        printf("%d\n", nev);
+        break;
+    }
 }
