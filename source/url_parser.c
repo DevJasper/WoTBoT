@@ -132,7 +132,7 @@ int url_parser_parse(url_t *parsed_url, char *url, bool verify_host)
 
         parsed_url->path = (char *)malloc(sizeof(char) * strlen(path) + 1);
         strncpy(parsed_url->path, path, strlen(path));
-
+        parsed_url->path[strlen(path)] = '\0';
         free(path);
     }
     else

@@ -26,6 +26,10 @@
         "utility": "c",
         "vector": "c",
         "__locale": "c",
-        "__string": "c"
+        "__string": "c",
+        "errno.h": "c",
+        "__bit_reference": "cpp",
+        "picohttpparser.h": "c",
+        "http_parser.h": "c"
     }
 }

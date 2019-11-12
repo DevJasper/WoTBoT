@@ -8,13 +8,15 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-
 #include "slog.h"
+
+#define MAX_READ_SIZE 4098
 
 void socket_cleanup(socket_t *s)
 {
     url_parser_free(s->url);
     close(s->fd);
+    free(s->buffer);
     free(s);
 }
 
@@ -87,57 +89,6 @@ bool socket_connect(socket_t *s)
 
     s->fd = check_sfd;
     return true;
-    // If we get here, we couldn't connect to any of the addresses.
-
-    // int ret = 0;
-    // int conn_fd;
-    // struct sockaddr_in server_addr = {0};
-
-    // conn_fd = socket(AF_INET, SOCK_STREAM, 0);
-    // if (conn_fd == -1)
-    // {
-    //     slog_error(0, "Failed to create socket: %s", s->url->host);
-    //     return false;
-    // }
-
-    // memset(&server_addr, 0, sizeof(server_addr));
-    // server_addr.sin_family = AF_INET;
-    // server_addr.sin_port = htons(atoi(s->url->port));
-
-    // if (s->url->ip == NULL)
-    // {
-    //     slog_error(0, "Failed to resolve IP address: %s", s->url->host);
-    //     return false;
-    // }
-
-    // server_addr.sin_addr.s_addr = inet_addr(s->url->ip);
-
-    // if (INADDR_NONE == server_addr.sin_addr.s_addr)
-    // {
-    //     close(conn_fd);
-    //     return false;
-    // }
-
-    // if (fcntl(conn_fd, F_SETFL, O_NONBLOCK) == -1)
-    // {
-    //     slog_error(0, "Failed to set non blocking mode: %s", s->url->host);
-    //     return false;
-    // }
-
-    // ret = connect(conn_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
-    // if (ret == -1)
-    // {
-
-    //     if (errno != EINPROGRESS)
-    //     {
-    //         slog_error(0, "Connecting to server failed: %s", s->url->host);
-    //         return false;
-    //     }
-    // }
-
-    // s->fd = conn_fd;
-
-    return true;
 }
 
 socket_t *socket_init(void)
@@ -145,6 +96,7 @@ socket_t *socket_init(void)
     socket_t *s = (socket_t *)malloc(sizeof(socket_t));
     s->fd = -1;
     s->url = url_parser_init();
+    s->buffer = (char *)malloc(1 * sizeof(char));
     return s;
 }
 
@@ -161,41 +113,52 @@ void socket_set_option(socket_t *s, socket_option_t option, void *value)
     }
 }
 
-void socket_read(socket_t *s)
+bool socket_read(socket_t *s)
 {
-    char buffer[200];
-    int rc, len;
-    do
+    int total_read_bytes = 0, read_bytes = 0, current_size = MAX_READ_SIZE;
+    bool status = false;
+    char buf[MAX_READ_SIZE];
+    s->buffer = (char *)malloc(MAX_READ_SIZE * sizeof(char));
+    // memset(s->buffer, 0, sizeof(s->buffer));
+
+    while (true)
     {
-        rc = recv(s->fd, buffer, strlen(buffer), 0);
-        if (rc < 0)
+        memset(buf, 0, MAX_READ_SIZE);
+        read_bytes = recv(s->fd, buf, MAX_READ_SIZE, 0);
+
+        if (read_bytes == -1)
         {
-            if (errno != EWOULDBLOCK)
+            if (errno == EAGAIN || errno == EWOULDBLOCK)
+                status = true;
+            else
+                status = false;
+
+            break;
+        }
+
+        if (read_bytes == 0)
+        {
+            s->buffer[total_read_bytes] = '\0';
+            status = true;
+            break;
+        }
+
+        if (read_bytes > 0)
+        {
+            if (total_read_bytes + read_bytes > current_size - 1)
             {
-                perror("  recv() failed");
+                current_size *= 2;
+                s->buffer = realloc(s->buffer, current_size);
             }
-            break;
+
+            strncpy(s->buffer + total_read_bytes, buf, read_bytes);
+            total_read_bytes += read_bytes;
+            continue;
         }
+    }
 
-        /**********************************************/
-        /* Check to see if the connection has been    */
-        /* closed by the client                       */
-        /**********************************************/
-        if (rc == 0)
-        {
-            printf("  Connection closed\n");
-            break;
-        }
-
-        /**********************************************/
-        /* Data was received                          */
-        /**********************************************/
-        len = rc;
-        printf("%d bytes received\n", len);
-
-        /**********************************************/
-
-    } while (true);
+    s->buffer_size = total_read_bytes;
+    return status;
 }
 
 bool socket_write(socket_t *s, void *buffer, size_t length)

@@ -1,6 +1,5 @@
-object/wotbot.o: source/wotbot.c source/wotbot.h source/queue.h \
-  source/socket.h /usr/local/include/openssl/ssl.h \
-  /usr/local/include/openssl/e_os2.h \
+object/wotbot.o: source/wotbot.c source/wotbot.h source/socket.h \
+  /usr/local/include/openssl/ssl.h /usr/local/include/openssl/e_os2.h \
   /usr/local/include/openssl/opensslconf.h \
   /usr/local/include/openssl/comp.h /usr/local/include/openssl/crypto.h \
   /usr/local/include/openssl/stack.h \
@@ -22,11 +21,12 @@ object/wotbot.o: source/wotbot.c source/wotbot.h source/queue.h \
   /usr/local/include/openssl/ssl2.h /usr/local/include/openssl/ssl3.h \
   /usr/local/include/openssl/tls1.h /usr/local/include/openssl/dtls1.h \
   /usr/local/include/openssl/pqueue.h /usr/local/include/openssl/ssl23.h \
-  /usr/local/include/openssl/srtp.h source/url_parser.h source/slog.h
+  /usr/local/include/openssl/srtp.h source/url_parser.h \
+  /usr/local/include/gumbo.h /usr/local/include/tag_enum.h \
+  source/http_status_codes.h source/response.h source/picohttpparser.h \
+  source/slog.h
 
 source/wotbot.h:
-
-source/queue.h:
 
 source/socket.h:
 
@@ -109,5 +109,15 @@ source/socket.h:
 /usr/local/include/openssl/srtp.h:
 
 source/url_parser.h:
+
+/usr/local/include/gumbo.h:
+
+/usr/local/include/tag_enum.h:
+
+source/http_status_codes.h:
+
+source/response.h:
+
+source/picohttpparser.h:
 
 source/slog.h:

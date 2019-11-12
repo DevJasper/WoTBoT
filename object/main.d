@@ -1,6 +1,5 @@
-object/main.o: source/main.c source/wotbot.h source/queue.h \
-  source/socket.h /usr/local/include/openssl/ssl.h \
-  /usr/local/include/openssl/e_os2.h \
+object/main.o: source/main.c source/wotbot.h source/socket.h \
+  /usr/local/include/openssl/ssl.h /usr/local/include/openssl/e_os2.h \
   /usr/local/include/openssl/opensslconf.h \
   /usr/local/include/openssl/comp.h /usr/local/include/openssl/crypto.h \
   /usr/local/include/openssl/stack.h \
@@ -25,8 +24,6 @@ object/main.o: source/main.c source/wotbot.h source/queue.h \
   /usr/local/include/openssl/srtp.h source/url_parser.h source/slog.h
 
 source/wotbot.h:
-
-source/queue.h:
 
 source/socket.h:
 

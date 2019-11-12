@@ -12,16 +12,17 @@ typedef enum
 
 typedef struct
 {
-    int fd;
+    int fd, buffer_size;
     url_t *url;
     SSL *ssl;
+    char *buffer;
 } socket_t;
 
 void socket_cleanup(socket_t *);
 socket_t *socket_init(void);
 void socket_set_option(socket_t *, socket_option_t, void *);
 bool socket_connect(socket_t *);
-void socket_read(socket_t *);
+bool socket_read(socket_t *);
 bool socket_write(socket_t *, void *, size_t);
 
 #endif

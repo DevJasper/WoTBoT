@@ -1,14 +1,20 @@
 #ifndef WOTBOT_H
 #define WOTBOT_H
 #include <sys/event.h>
-#include "queue.h"
 #include "socket.h"
 
 #define CONN_QUEUE_SIZE 200
+#define EVENT_INIT_SIZE 1000
 
 typedef struct
 {
-    queue_t *queue;
+    int fd, size, position;
+    struct kevent *queue, *changes;
+} wotbot_event_t;
+
+typedef struct
+{
+    wotbot_event_t *event;
     // short position;
     // socket_t *queue[CONN_QUEUE_SIZE];
 } wotbot_t;

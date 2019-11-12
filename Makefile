@@ -23,7 +23,7 @@ TARGET_ARCH :=
 
 # Compiler Flags
 ALL_CFLAGS		:= $(CFLAGS)
-ALL_CFLAGS		+=  -Wall -Wextra -pedantic -ansi 
+ALL_CFLAGS		+=  -Wall -Wextra -pedantic -ansi
 ALL_CFLAGS		+= -fno-strict-aliasing
 ALL_CFLAGS		+= -Wuninitialized -Winit-self -Wfloat-equal
 ALL_CFLAGS		+= -Wundef -Wshadow -Wc++-compat -Wcast-qual -Wcast-align
@@ -37,7 +37,7 @@ ALL_CPPFLAGS	:= $(CPPFLAGS)
 
 # Linker Flags
 ALL_LDFLAGS		:= $(LDFLAGS)
-ALL_LDLIBS		:=  -lc
+ALL_LDLIBS		:=  -lc -lgumbo
 
 
 # Source, Binaries, Dependencies
@@ -94,7 +94,7 @@ $(BIN): $(OBJ)
 	$(LD) $(ALL_LDFLAGS) $^ $(ALL_LDLIBS) -o $@
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
-	$(CC) -g $(ALL_CFLAGS) $(ALL_CPPFLAGS)  -c -std=gnu99 -MMD -MP -o $@ $<
+	$(CC)  $(ALL_CFLAGS) $(ALL_CPPFLAGS)  -c -std=gnu99 -MMD -MP -o $@ $<
 
 
 install: $(BIN)
