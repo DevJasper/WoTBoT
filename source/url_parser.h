@@ -5,13 +5,9 @@
 
 typedef struct
 {
-    char *protocol;
-    char *host;
-    char *port;
-    char *path;
-    char *query_string;
+    char *protocol, *host, *port, *path, *query_string, *ip, *self;
     int host_exists;
-    char *ip;
+
 } url_t;
 
 void url_parser_free(url_t *);

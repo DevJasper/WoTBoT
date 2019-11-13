@@ -46,6 +46,8 @@ int url_parser_parse(url_t *parsed_url, char *url, bool verify_host)
     char *host_token_ptr;
     char *path = NULL;
 
+    parsed_url->self = strdup(url);
+
     if (!strstr(url, "http") && !strstr(url, "https"))
     {
         char *tmp = "http://";

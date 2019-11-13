@@ -37,7 +37,7 @@ ALL_CPPFLAGS	:= $(CPPFLAGS)
 
 # Linker Flags
 ALL_LDFLAGS		:= $(LDFLAGS)
-ALL_LDLIBS		:=  -lc -lgumbo
+ALL_LDLIBS		:=  -lc -lgumbo -lssl -lcrypto
 
 
 # Source, Binaries, Dependencies

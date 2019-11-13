@@ -12,7 +12,7 @@ typedef struct
     const char *msg;
     char *body;
     size_t msg_len;
-    struct phr_header headers[4];
+    struct phr_header headers[10];
     size_t num_headers;
 
 } response_t;

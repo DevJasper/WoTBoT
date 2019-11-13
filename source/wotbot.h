@@ -1,5 +1,7 @@
 #ifndef WOTBOT_H
 #define WOTBOT_H
+// #include <openssl/ssl.h>
+// #include <openssl/err.h>
 #include <sys/event.h>
 #include "socket.h"
 
@@ -9,14 +11,14 @@
 typedef struct
 {
     int fd, size, position;
-    struct kevent *queue, *changes;
+    struct kevent *changes;
+
 } wotbot_event_t;
 
 typedef struct
 {
     wotbot_event_t *event;
-    // short position;
-    // socket_t *queue[CONN_QUEUE_SIZE];
+    SSL_CTX *ctx;
 } wotbot_t;
 
 void wotbot_add_download(wotbot_t *, char *);

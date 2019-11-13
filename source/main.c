@@ -11,8 +11,7 @@ int main()
     wotbot_global_init();
     wotbot_t *wb = wotbot_init();
     wotbot_add_download(wb, "bcswfkdmvtnxlrzh.neverssl.com");
-    // wotbot_add_download(wb, "http://www.stealmylogin.com");
-    // wotbot_add_download(wb, "twitter.com");
+    wotbot_add_download(wb, "http://www.stealmylogin.com");
     wotbot_perform(wb);
     wotbot_cleanup(wb);
 
